@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>电影散点图</title>
+    <style>
+        div{
+            width: 900px;height:550px;
+            margin: 0 auto;
+        }
+    </style>
+    <!-- 引入 ECharts 文件 -->
+    <script src="echarts.min.js"></script>
+    <script src="data.js"></script>
+</head>
+<body>
+<a href="index.html">电影饼状图</a>
+<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+<div id="container"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('container'));
+    let selected={};
+    let series=[];
+
+    for (let i=0;i<categories.length;i++){
+        let category=categories[i];
+        let movies=[];
+        if(category=="全部"){
+            selected[category]=true;
+            movies=data;
+        }else{
+            selected[category]=false;
+            movies=data.filter(ele=>ele[4].includes(category));
+        }
+        let obj={
+            name: category,
+            data: category=="全部"?data:movies,
+            type: 'scatter',
+            symbolSize: function (data) {
+                return Math.ceil(data[2]/10);
+            },
+            label: {
+                emphasis: {
+                    show: true,
+                    formatter: function (param) {
+                        return param.data[3];
+                    },
+                    position: 'top'
+                }
+            },
+
+            itemStyle: {
+                normal: {
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(25, 100, 150, 0.5)',
+                    shadowOffsetY: 5,
+                    color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+                        offset: 0,
+                        color: 'rgb(129, 227, 238)'
+                    }, {
+                        offset: 1,
+                        color: 'rgb(25, 183, 207)'
+                    }])
+                }
+            }
+        };
+        series.push(obj);
+    }
+
+
+    // 指定图表的配置项和数据
+    var option = {
+        backgroundColor: new echarts.graphic.RadialGradient(0.3, 0.3, 0.8, [{
+            offset: 0,
+            color: '#f7f8fa'
+        }, {
+            offset: 1,
+            color: '#cdd0d5'
+        }]),
+        // title: {
+        //     text: '散点图'
+        // },
+        legend: {
+            right: 10,
+            data: categories,
+            selected,
+            selectedMode:"single"
+        },
+        // tooltip:{
+        //   trigger:"item",
+        //   formatter:function (params) {
+        //       let data=params.data;
+        //       return `名字:${data[3]}<br/>
+        //                类型:${data[4]}<br>
+        //                评分:${data[2]}
+        //       `
+        //   }
+        // },
+        xAxis: {
+            name:"评论次数",
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            }
+        },
+        yAxis: {
+            name:"评分",
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            },
+            scale: true
+        },
+        series
+
+
+        };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+</body>
+</html>
